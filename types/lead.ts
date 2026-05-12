@@ -1,6 +1,11 @@
 export type Lead = {
   name: string;
-  email: string;
   company: string;
-  message: string;
+  email: string;
+  location: string;
+  revenueRange: string;
+  employeeCount: string;
+  biggestChallenge: string;
+  preferredContactMethod: "email" | "phone" | "whatsapp";
+  message?: string;
 };

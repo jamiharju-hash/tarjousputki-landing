@@ -62,19 +62,19 @@ npm run lint
 
 ## 5) Environment variables
 
-No environment variables are required right now.
+Required local file:
 
-If/when integrations are added, define variables in `.env.local` (for local development) and in Vercel Project Settings (for production). Suggested future variables:
+1. Copy `.env.example` to `.env.local`:
 
-- `HUBSPOT_API_KEY` / `HUBSPOT_ACCESS_TOKEN`
-- `AIRTABLE_API_KEY`
-- `AIRTABLE_BASE_ID`
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `MAKE_WEBHOOK_URL` or `ZAPIER_WEBHOOK_URL`
-- `EMAIL_FROM`
-- `EMAIL_TO`
-- `EMAIL_PROVIDER_API_KEY`
+```bash
+cp .env.example .env.local
+```
+
+2. Set optional webhook destination if you want to forward leads:
+
+- `LEAD_WEBHOOK_URL`
+
+If `LEAD_WEBHOOK_URL` is not set, leads are only validated and logged server-side.
 
 ## 6) Build command
 
@@ -107,7 +107,7 @@ npm run build
 ## 8) Lead form behavior
 
 - The form submits data to `POST /api/leads`.
-- Server-side validation is executed before success response.
+- Server-side validation requires: `name`, `company`, `email`, `location`, `revenueRange`, `employeeCount`, `biggestChallenge`, and `preferredContactMethod`.
 - On valid submit, the API returns a success message.
 - **Current behavior:** submissions are logged server-side.
 - **Current behavior:** no external CRM/database persistence is configured yet.
