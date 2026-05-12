@@ -13,6 +13,7 @@ const initialState: Lead = {
   employeeCount: "",
   biggestChallenge: "",
   preferredContactMethod: "email",
+  honeypot: "",
   message: "",
 };
 
@@ -64,6 +65,16 @@ export default function ContactForm() {
           <option value="phone">Puhelin</option>
           <option value="whatsapp">WhatsApp</option>
         </select>
+        <input
+          className="hidden"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          name="companyWebsite"
+          placeholder="Jätä tämä kenttä tyhjäksi"
+          value={form.honeypot ?? ""}
+          onChange={(e) => setForm({ ...form, honeypot: e.target.value })}
+        />
 
         <button className="rounded-lg bg-cyan-400 px-4 py-3 font-semibold text-slate-950" type="submit">Lähetä</button>
         {status ? <p className="text-sm text-slate-700">{status}</p> : null}

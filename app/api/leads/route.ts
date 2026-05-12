@@ -3,7 +3,18 @@ import { validateLead } from "@/lib/validators";
 import type { Lead } from "@/types/lead";
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as Partial<Lead>;
+  let body: Partial<Lead>;
+
+  try {
+    body = (await request.json()) as Partial<Lead>;
+  } catch {
+    return NextResponse.json({ message: "Virheellinen pyyntödata." }, { status: 400 });
+  }
+
+  if (body.honeypot && body.honeypot.trim().length > 0) {
+    return NextResponse.json({ message: "Kiitos! Olemme sinuun pian yhteydessä." }, { status: 200 });
+  }
+
   const validation = validateLead(body);
 
   if (!validation.valid) {

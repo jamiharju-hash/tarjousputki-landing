@@ -7,5 +7,6 @@ export type Lead = {
   employeeCount: string;
   biggestChallenge: string;
   preferredContactMethod: "email" | "phone" | "whatsapp";
+  honeypot?: string;
   message?: string;
 };
