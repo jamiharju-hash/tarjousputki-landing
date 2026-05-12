@@ -1,1 +1,12 @@
-export default function ProcessSection() { return <section className="mx-auto max-w-6xl px-6 py-8"><h2 className="text-2xl font-bold">Toimitusprosessi</h2><p className="mt-3 text-slate-700">Kartoitus, toteutus, käyttöönotto ja jatkuva optimointi yhden kumppanin mallilla.</p></section>; }
+import { deliverySteps } from "@/lib/content";
+import { Card, Section } from "./ui";
+
+export default function ProcessSection() {
+  return (
+    <Section title="Toimitus askel askeleelta">
+      <Card>
+        <ol className="space-y-3 text-slate-700">{deliverySteps.map((s) => <li key={s}>{s}</li>)}</ol>
+      </Card>
+    </Section>
+  );
+}

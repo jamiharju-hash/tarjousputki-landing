@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tarjousputki Landing",
-  description: "Kasvata myyntiä selkeällä tarjousputkella.",
+  title: "Tarjousputki | B2B tarjouspyyntöputki LVI-yrityksille",
+  description: "Systemaattinen B2B-tarjouspyyntöputki suomalaisille LVI- ja talotekniikkayrityksille.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -1,1 +1,13 @@
-export default function ProofSection() { return <section className="mx-auto max-w-6xl px-6 py-8"><h2 className="text-2xl font-bold">Näyttö tuloksista</h2><p className="mt-3 text-slate-700">Tyypillisesti asiakkaamme ovat kasvattaneet laadukkaita liidejä 20-45 % ensimmäisen kvartaalin aikana.</p></section>; }
+import { disclaimer } from "@/lib/content";
+import { Card, Section } from "./ui";
+
+export default function ProofSection() {
+  return (
+    <Section title="Läpinäkyvä toimintamalli">
+      <Card className="bg-amber-50">
+        <p className="font-semibold text-slate-900">Tärkeä rajaus</p>
+        <p className="mt-2 text-slate-700">{disclaimer}</p>
+      </Card>
+    </Section>
+  );
+}

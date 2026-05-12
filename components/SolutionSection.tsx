@@ -1,1 +1,12 @@
-export default function SolutionSection() { return <section className="mx-auto max-w-6xl px-6 py-8"><h2 className="text-2xl font-bold">Ratkaisu</h2><p className="mt-3 text-slate-700">Tarjousputki yhdistää laskeutumissivun, automaatiot ja raportoinnin yhdeksi selkeäksi myyntiprosessiksi.</p></section>; }
+import { solutionPoints } from "@/lib/content";
+import { Card, Section } from "./ui";
+
+export default function SolutionSection() {
+  return (
+    <Section id="ratkaisu" title="Ratkaisu: systemaattinen B2B-tarjouspyyntöputki">
+      <div className="grid gap-4 md:grid-cols-3">
+        {solutionPoints.map((p) => <Card key={p}><p className="text-slate-700">{p}</p></Card>)}
+      </div>
+    </Section>
+  );
+}

@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import type { Lead } from "@/types/lead";
+import { Section } from "./ui";
 
 const initialState: Lead = { name: "", email: "", company: "", message: "" };
 
@@ -11,27 +12,22 @@ export default function ContactForm() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const response = await fetch("/api/leads", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    const response = await fetch("/api/leads", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
     const data = await response.json();
     setStatus(data.message ?? "Lähetys epäonnistui.");
     if (response.ok) setForm(initialState);
   }
 
   return (
-    <section id="yhteys" className="mx-auto max-w-4xl px-6 py-12">
-      <h2 className="text-2xl font-bold">Pyydä yhteydenotto</h2>
-      <form onSubmit={onSubmit} className="mt-4 grid gap-3">
-        <input className="rounded border p-3" placeholder="Nimi" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-        <input className="rounded border p-3" placeholder="Sähköposti" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-        <input className="rounded border p-3" placeholder="Yritys" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} required />
-        <textarea className="rounded border p-3" placeholder="Miten voimme auttaa?" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} rows={4} required />
-        <button className="rounded bg-sky-500 px-4 py-3 font-semibold text-white" type="submit">Lähetä</button>
+    <Section id="yhteys" title="Pyydä yhteydenotto">
+      <form onSubmit={onSubmit} className="grid gap-3 rounded-2xl bg-white p-6">
+        <input className="rounded-lg border border-slate-300 p-3" placeholder="Nimi" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+        <input className="rounded-lg border border-slate-300 p-3" placeholder="Sähköposti" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+        <input className="rounded-lg border border-slate-300 p-3" placeholder="Yritys" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} required />
+        <textarea className="rounded-lg border border-slate-300 p-3" placeholder="Mikä on tavoitteenne tarjouspyyntöjen suhteen seuraavan 90 päivän aikana?" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} rows={4} required />
+        <button className="rounded-lg bg-cyan-400 px-4 py-3 font-semibold text-slate-950" type="submit">Lähetä</button>
+        {status ? <p className="text-sm text-slate-700">{status}</p> : null}
       </form>
-      {status ? <p className="mt-3 text-sm text-slate-700">{status}</p> : null}
-    </section>
+    </Section>
   );
 }
