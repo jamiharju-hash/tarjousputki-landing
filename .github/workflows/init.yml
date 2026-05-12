@@ -1,0 +1,107 @@
+name: Init Tarjousputki
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create project files
+        run: |
+          if [ -f package.json ]; then echo "Already initialized"; exit 0; fi
+          npx create-next-app@latest . --ts --tailwind --eslint --app --use-npm --src-dir false --import-alias "@/*" --yes
+          rm -f app/page.tsx app/globals.css README.md
+          mkdir -p app/api/leads components lib types
+          cat > app/globals.css <<'EOF'
+          @tailwind base;
+          @tailwind components;
+          @tailwind utilities;
+          html{scroll-behavior:smooth}body{background:#f8fafc;color:#0f172a}.card{border-radius:1.5rem;background:white;box-shadow:0 20px 70px rgba(15,23,42,.12)}
+          EOF
+          cat > lib/content.ts <<'EOF'
+          export const site={name:'Tarjousputki',headline:'Enemmän tarjouspyyntöjä, vähemmän säätöä.',subheadline:'Rakennamme LVI-yrityksellesi systemaattisen B2B-tarjouspyyntöputken, joka tuo keskusteluja isännöitsijöiltä, rakennusliikkeiltä, huoltoyhtiöiltä ja kiinteistömanageroilta.',cta:'Varaa maksuton 15 min kartoitus'};
+          export const packages=[{name:'Startti',price:'790 €/kk',setup:'+ 490 € setup',features:['100 B2B prospects / month','1 target segment','1 email sequence','monthly report']},{name:'Kasvu',price:'1 490 €/kk',setup:'+ 990 € setup',badge:'Suosituin',features:['250–400 B2B prospects / month','2–3 target segments','2 email sequences','follow-ups','lead qualification','CRM pipeline','weekly report','monthly review']},{name:'Dominanssi',price:'2 900 €/kk',setup:'+ 1 500 € setup',features:['600–1 000 B2B prospects / month','4–5 target segments','email + phone + LinkedIn','call qualification','weekly meeting','monthly analysis']}];
+          export const disclaimer='Palvelu tuottaa kvalifioituja keskusteluja ja tarjouspyyntömahdollisuuksia. Emme takaa toteutuneita kauppoja, koska lopullinen kauppa riippuu yrityksenne vasteajasta, hinnoittelusta, tarjouksen laadusta ja kapasiteetista.';
+          EOF
+          cat > types/lead.ts <<'EOF'
+          export type LeadPayload={name:string;company:string;email:string;phone:string;location:string;revenueRange:string;employeeCount:string;services:string;targetCustomers:string;challenge:string;preferredContactMethod:string};
+          EOF
+          cat > lib/validators.ts <<'EOF'
+          import type {LeadPayload} from '@/types/lead';
+          export function validateLead(body:Partial<LeadPayload>){const required=['name','company','email','phone','location','revenueRange','employeeCount','services','targetCustomers','challenge','preferredContactMethod'] as const;const errors:Record<string,string>={};for(const key of required){if(!body[key])errors[key]='Pakollinen kenttä'}if(body.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email))errors.email='Virheellinen sähköposti';return{ok:Object.keys(errors).length===0,errors,data:body as LeadPayload}}
+          EOF
+          cat > app/api/leads/route.ts <<'EOF'
+          import {NextResponse} from 'next/server';import {validateLead} from '@/lib/validators';
+          export async function POST(req:Request){try{const body=await req.json();const v=validateLead(body);if(!v.ok)return NextResponse.json({ok:false,errors:v.errors},{status:400});console.info('Tarjousputki lead submitted',{...v.data,submittedAt:new Date().toISOString(),source:'tarjousputki-landing'});return NextResponse.json({ok:true})}catch{return NextResponse.json({ok:false,error:'Lähetys epäonnistui'},{status:500})}}
+          EOF
+          cat > components/Header.tsx <<'EOF'
+          import {site} from '@/lib/content';export function Header(){return <header className="sticky top-0 z-50 bg-slate-950/95 text-white backdrop-blur"><nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4"><a href="#top" className="text-lg font-black">Tarjousputki</a><div className="hidden gap-6 md:flex"><a href="#ongelma">Ongelma</a><a href="#ratkaisu">Ratkaisu</a><a href="#paketit">Paketit</a><a href="#faq">FAQ</a></div><a href="#yhteys" className="rounded-full bg-green-400 px-4 py-2 text-sm font-black text-slate-950">{site.cta}</a></nav></header>}
+          EOF
+          cat > components/Hero.tsx <<'EOF'
+          import {site} from '@/lib/content';export function Hero(){return <section id="top" className="bg-slate-950 px-4 py-24 text-white"><div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2 lg:items-center"><div><p className="mb-4 text-sm font-bold uppercase text-green-400">B2B-tarjouspyyntöputki LVI-yrityksille</p><h1 className="text-4xl font-black tracking-tight sm:text-6xl">{site.headline}</h1><p className="mt-6 text-lg leading-8 text-slate-300">{site.subheadline}</p><ul className="mt-8 grid gap-3 text-slate-200"><li>• Kohderyhmät: isännöitsijät, rakennusliikkeet, huoltoyhtiöt ja kiinteistömanagerit.</li><li>• Prospektointi, viestit, seurannat ja raportointi yhdeksi putkeksi.</li><li>• Selkeä B2B-prosessi ilman takuukauppalupauksia.</li></ul><div className="mt-10 flex flex-col gap-3 sm:flex-row"><a href="#yhteys" className="rounded-full bg-green-400 px-6 py-3 text-center font-black text-slate-950">{site.cta}</a><a href="#paketit" className="rounded-full border border-white/20 px-6 py-3 text-center font-black">Katso paketit</a></div></div><div className="card p-6 text-slate-950"><p className="text-sm font-bold uppercase text-slate-500">Pipeline</p>{['Prospektit','Vastaukset','Keskustelut','Tarjouspyyntömahdollisuudet'].map((x,i)=><div key={x} className="mt-4 flex justify-between rounded-2xl border p-4"><b>{x}</b><span>Vaihe {i+1}</span></div>)}</div></div></section>}
+          EOF
+          cat > components/ProblemSection.tsx <<'EOF'
+          export function ProblemSection(){return <section id="ongelma" className="px-4 py-20"><div className="mx-auto max-w-7xl"><p className="text-sm font-bold uppercase text-green-600">Ongelma</p><h2 className="mt-3 text-3xl font-black">Asiakashankinta on liian satunnaista.</h2><div className="mt-8 grid gap-6 lg:grid-cols-2"><div className="card p-8"><h3 className="text-xl font-black">Nykytila</h3><p className="mt-4 leading-7 text-slate-600">Tarjouspyynnöt tulevat tuttujen, puskaradion ja vanhojen asiakkaiden kautta. Myyntityö jää yrittäjän muistin ja ajan varaan.</p></div><div className="card bg-slate-950 p-8 text-white"><h3 className="text-xl font-black">Seuraukset</h3><p className="mt-4 leading-7 text-slate-300">Liikevaihto aaltoilee, tarjouksia tehdään väärään aikaan ja hyvät B2B-kohteet menevät kilpailijoille, jotka ovat aiemmin yhteydessä.</p></div></div></div></section>}
+          EOF
+          cat > components/SolutionSection.tsx <<'EOF'
+          export function SolutionSection(){return <section id="ratkaisu" className="bg-slate-100 px-4 py-20"><div className="mx-auto max-w-7xl"><p className="text-sm font-bold uppercase text-green-600">Ratkaisu</p><h2 className="mt-3 text-3xl font-black">Systemaattinen B2B-tarjouspyyntöputki.</h2><div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4">{['Oikeat B2B-listat','Segmenttikohtaiset viestit','Follow-upit ja kirjaus','Raportointi ja optimointi'].map(x=><div key={x} className="card p-6 font-bold">{x}</div>)}</div></div></section>}
+          EOF
+          cat > components/HowItWorks.tsx <<'EOF'
+          export function HowItWorks(){const s=['Kohderyhmän rajaus','Prospektien keruu','Viestisekvenssit','Seuranta ja kvalifiointi'];return <section className="px-4 py-20"><div className="mx-auto max-w-7xl"><p className="text-sm font-bold uppercase text-green-600">Miten prosessi toimii</p><h2 className="mt-3 text-3xl font-black">Ei kampanja. Putki.</h2><div className="mt-8 grid gap-5 md:grid-cols-4">{s.map((x,i)=><div key={x} className="card p-6"><b>{i+1}. {x}</b><p className="mt-3 text-slate-600">Selkeä vaihe, joka tekee asiakashankinnasta johdettavaa.</p></div>)}</div></div></section>}
+          EOF
+          cat > components/IdealCustomer.tsx <<'EOF'
+          export function IdealCustomer(){return <section className="bg-slate-950 px-4 py-20 text-white"><div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-2"><div><p className="text-sm font-bold uppercase text-green-400">Kenelle</p><h2 className="mt-3 text-3xl font-black">LVI-, IV-, putki-, lämpöpumppu- ja talotekniikkayrityksille.</h2><p className="mt-4 text-slate-300">Paras kohde: 3–15 työntekijää, 150k–1.5M € liikevaihto ja keskimääräinen työn arvo yli 1 000 €.</p></div><div className="card p-8 text-slate-950"><h3 className="font-black">Ei sovi, jos haetaan takuukauppoja, kapasiteetti on epäselvä tai tarjouspyyntöihin ei ehditä vastata nopeasti.</h3></div></div></section>}
+          EOF
+          cat > components/PricingSection.tsx <<'EOF'
+          import {disclaimer,packages} from '@/lib/content';export function PricingSection(){return <section id="paketit" className="px-4 py-20"><div className="mx-auto max-w-7xl"><p className="text-sm font-bold uppercase text-green-600">Paketit</p><h2 className="mt-3 text-3xl font-black">Valitse putken laajuus.</h2><div className="mt-8 grid gap-6 lg:grid-cols-3">{packages.map(p=><article key={p.name} className={`card relative p-8 ${p.badge?'ring-2 ring-green-400':''}`}>{p.badge&&<span className="absolute right-6 top-6 rounded-full bg-green-400 px-3 py-1 text-xs font-black">{p.badge}</span>}<h3 className="text-2xl font-black">{p.name}</h3><p className="mt-5 text-4xl font-black">{p.price}</p><p className="mt-1 font-bold text-slate-500">{p.setup}</p><ul className="mt-6 grid gap-2 text-slate-700">{p.features.map(f=><li key={f}>• {f}</li>)}</ul><a href="#yhteys" className="mt-8 inline-flex w-full justify-center rounded-full bg-slate-950 px-5 py-3 font-black text-white">Keskustele paketista</a></article>)}</div><p className="mt-8 rounded-3xl bg-slate-100 p-5 text-sm leading-7 text-slate-600">{disclaimer}</p></div></section>}
+          EOF
+          cat > components/PilotSection.tsx <<'EOF'
+          export function PilotSection(){return <section className="bg-slate-100 px-4 py-20"><div className="mx-auto max-w-7xl"><p className="text-sm font-bold uppercase text-green-600">Suositus</p><h2 className="mt-3 text-3xl font-black">90 päivän Kasvu-pilotti.</h2><p className="mt-4 max-w-3xl leading-8 text-slate-600">Kasvu on järkevin aloitus, koska siinä saadaan riittävä määrä kontakteja, segmenttejä ja follow-upeja. Yksi kuukausi kertoo harvoin tarpeeksi B2B-putken laadusta.</p></div></section>}
+          EOF
+          cat > components/ProofSection.tsx <<'EOF'
+          export function ProofSection(){return <section className="px-4 py-20"><div className="mx-auto max-w-7xl rounded-3xl bg-slate-950 p-8 text-white"><h2 className="text-3xl font-black">Pilotissa mitataan oikeita välituloksia.</h2><div className="mt-8 grid gap-4 md:grid-cols-3">{['Prospektit ja tavoitetut päättäjät','Vastausprosentti segmenteittäin','Keskustelut ja tarjouspyyntömahdollisuudet'].map(x=><div key={x} className="rounded-2xl bg-white p-5 font-bold text-slate-950">{x}</div>)}</div></div></section>}
+          EOF
+          cat > components/ProcessSection.tsx <<'EOF'
+          export function ProcessSection(){const s=['Kartoitus','Segmentointi','Putken rakennus','Pilotin ajo','Optimointi'];return <section className="bg-slate-100 px-4 py-20"><div className="mx-auto max-w-4xl"><h2 className="text-3xl font-black">Toimitusprosessi</h2><div className="mt-8 grid gap-4">{s.map((x,i)=><div key={x} className="card flex gap-4 p-5"><b>{i+1}</b><span>{x}</span></div>)}</div></div></section>}
+          EOF
+          cat > components/FAQSection.tsx <<'EOF'
+          export function FAQSection(){const faqs=[['Takaatteko kauppoja?','Emme. Tuotamme kvalifioituja keskusteluja ja tarjouspyyntömahdollisuuksia.'],['Miksi 90 päivää?','B2B-myyntiputki tarvitsee tarpeeksi kontakteja, follow-upeja ja dataa.'],['Voiko tämän liittää CRM:ään?','Kyllä. Myöhemmin integraatio voi mennä HubSpotiin, Airtableen, Supabaseen tai sähköpostiautomaatioon.']];return <section id="faq" className="px-4 py-20"><div className="mx-auto max-w-4xl"><h2 className="text-3xl font-black">FAQ</h2><div className="card mt-8 divide-y">{faqs.map(([q,a])=><details key={q} className="p-6"><summary className="cursor-pointer font-black">{q}</summary><p className="mt-3 text-slate-600">{a}</p></details>)}</div></div></section>}
+          EOF
+          cat > components/ContactForm.tsx <<'EOF'
+          'use client';import {useState} from 'react';import type {LeadPayload} from '@/types/lead';
+          const empty:LeadPayload={name:'',company:'',email:'',phone:'',location:'',revenueRange:'',employeeCount:'',services:'',targetCustomers:'',challenge:'',preferredContactMethod:'Puhelu'};
+          export function ContactForm(){const[form,setForm]=useState(empty);const[status,setStatus]=useState('idle');const set=(k:keyof LeadPayload,v:string)=>setForm({...form,[k]:v});async function submit(e:React.FormEvent){e.preventDefault();setStatus('loading');const r=await fetch('/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});setStatus(r.ok?'success':'error');if(r.ok)setForm(empty)}const input='mt-2 w-full rounded-2xl border px-4 py-3';return <section id="yhteys" className="bg-slate-950 px-4 py-20 text-white"><div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-2"><div><h2 className="text-3xl font-black">Varaa maksuton 15 minuutin kartoitus.</h2><p className="mt-4 text-slate-300">Käydään läpi palvelut, alue, kapasiteetti ja sopivat B2B-kohderyhmät.</p></div><form onSubmit={submit} className="card grid gap-4 p-6 text-slate-950"><input required className={input} placeholder="Nimi" value={form.name} onChange={e=>set('name',e.target.value)}/><input required className={input} placeholder="Yritys" value={form.company} onChange={e=>set('company',e.target.value)}/><input required type="email" className={input} placeholder="Sähköposti" value={form.email} onChange={e=>set('email',e.target.value)}/><input required className={input} placeholder="Puhelin" value={form.phone} onChange={e=>set('phone',e.target.value)}/><input required className={input} placeholder="Sijainti" value={form.location} onChange={e=>set('location',e.target.value)}/><input required className={input} placeholder="Liikevaihtoluokka" value={form.revenueRange} onChange={e=>set('revenueRange',e.target.value)}/><input required className={input} placeholder="Henkilöstömäärä" value={form.employeeCount} onChange={e=>set('employeeCount',e.target.value)}/><textarea required className={input} placeholder="Palvelut" value={form.services} onChange={e=>set('services',e.target.value)}/><textarea required className={input} placeholder="Tavoiteasiakkaat" value={form.targetCustomers} onChange={e=>set('targetCustomers',e.target.value)}/><textarea required className={input} placeholder="Suurin asiakashankinnan haaste" value={form.challenge} onChange={e=>set('challenge',e.target.value)}/><select className={input} value={form.preferredContactMethod} onChange={e=>set('preferredContactMethod',e.target.value)}><option>Puhelu</option><option>Sähköposti</option><option>WhatsApp</option></select><button className="rounded-full bg-green-400 px-6 py-4 font-black text-slate-950">{status==='loading'?'Lähetetään...':'Varaa maksuton 15 min kartoitus'}</button>{status==='success'&&<p className="font-bold text-green-700">Kiitos. Otamme yhteyttä.</p>}{status==='error'&&<p className="font-bold text-red-700">Tarkista kentät.</p>}</form></div></section>}
+          EOF
+          cat > components/Footer.tsx <<'EOF'
+          export function Footer(){return <footer className="bg-slate-950 px-4 py-10 text-slate-400"><div className="mx-auto max-w-7xl"><b className="text-white">Tarjousputki</b><p className="mt-2 text-sm">Systemaattinen B2B-tarjouspyyntöputki LVI-yrityksille.</p><a href="#yhteys" className="fixed inset-x-4 bottom-4 rounded-full bg-green-400 px-5 py-4 text-center font-black text-slate-950 lg:hidden">Varaa maksuton kartoitus</a></div></footer>}
+          EOF
+          cat > app/page.tsx <<'EOF'
+          import {ContactForm} from '@/components/ContactForm';import {FAQSection} from '@/components/FAQSection';import {Footer} from '@/components/Footer';import {Header} from '@/components/Header';import {Hero} from '@/components/Hero';import {HowItWorks} from '@/components/HowItWorks';import {IdealCustomer} from '@/components/IdealCustomer';import {PilotSection} from '@/components/PilotSection';import {PricingSection} from '@/components/PricingSection';import {ProblemSection} from '@/components/ProblemSection';import {ProcessSection} from '@/components/ProcessSection';import {ProofSection} from '@/components/ProofSection';import {SolutionSection} from '@/components/SolutionSection';
+          export default function Home(){return <main><Header/><Hero/><ProblemSection/><SolutionSection/><HowItWorks/><IdealCustomer/><PricingSection/><PilotSection/><ProofSection/><ProcessSection/><FAQSection/><ContactForm/><Footer/></main>}
+          EOF
+          cat > app/layout.tsx <<'EOF'
+          import type {Metadata} from 'next';import './globals.css';
+          export const metadata:Metadata={title:'Tarjousputki | B2B-tarjouspyyntöputki LVI-yrityksille',description:'Systemaattinen B2B-tarjouspyyntöputki suomalaisille LVI-yrityksille.'};
+          export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="fi"><body>{children}</body></html>}
+          EOF
+          cat > README.md <<'EOF'
+          # Tarjousputki Landing
+          Next.js + TypeScript + Tailwind CSS landing page B2B-tarjouspyyntöputkelle.
+          ## Kehitys
+          `npm install && npm run dev`
+          ## Tarkistukset
+          `npm run typecheck && npm run lint && npm run build`
+          ## Deploy
+          Importoi repo Verceliin. Framework: Next.js. Build: `npm run build`.
+          EOF
+          git add .
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m "feat: implement Tarjousputki landing page"
+          git push
