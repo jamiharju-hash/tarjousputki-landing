@@ -10,5 +10,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: validation.error }, { status: 400 });
   }
 
+  console.info("[leads] New lead submission", body);
+
   return NextResponse.json({ message: "Kiitos! Olemme sinuun pian yhteydessä." }, { status: 200 });
 }
