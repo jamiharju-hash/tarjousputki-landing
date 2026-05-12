@@ -1,0 +1,1 @@
+export default function PricingSection() { return <section className="mx-auto max-w-6xl px-6 py-8"><h2 className="text-2xl font-bold">Hinnoittelu</h2><p className="mt-3 text-slate-700">Aloituspaketti 990 €/kk + käyttöönotto. Skaalautuu liidimäärien ja integraatioiden mukaan.</p></section>; }

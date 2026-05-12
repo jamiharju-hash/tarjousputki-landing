@@ -1,0 +1,1 @@
+export default function SolutionSection() { return <section className="mx-auto max-w-6xl px-6 py-8"><h2 className="text-2xl font-bold">Ratkaisu</h2><p className="mt-3 text-slate-700">Tarjousputki yhdistää laskeutumissivun, automaatiot ja raportoinnin yhdeksi selkeäksi myyntiprosessiksi.</p></section>; }
