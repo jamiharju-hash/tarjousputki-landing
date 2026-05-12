@@ -1,0 +1,1 @@
+export default function IdealCustomer() { return <section className="mx-auto max-w-6xl px-6 py-8"><h2 className="text-2xl font-bold">Kenelle tämä sopii</h2><p className="mt-3 text-slate-700">B2B-palveluyrityksille, jotka haluavat kasvattaa myyntiputken laatua ja nopeuttaa tarjousprosessia.</p></section>; }

@@ -1,0 +1,1 @@
+export default function ProcessSection() { return <section className="mx-auto max-w-6xl px-6 py-8"><h2 className="text-2xl font-bold">Toimitusprosessi</h2><p className="mt-3 text-slate-700">Kartoitus, toteutus, käyttöönotto ja jatkuva optimointi yhden kumppanin mallilla.</p></section>; }

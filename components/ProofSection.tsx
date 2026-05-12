@@ -1,0 +1,1 @@
+export default function ProofSection() { return <section className="mx-auto max-w-6xl px-6 py-8"><h2 className="text-2xl font-bold">Näyttö tuloksista</h2><p className="mt-3 text-slate-700">Tyypillisesti asiakkaamme ovat kasvattaneet laadukkaita liidejä 20-45 % ensimmäisen kvartaalin aikana.</p></section>; }

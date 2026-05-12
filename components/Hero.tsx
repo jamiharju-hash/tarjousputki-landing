@@ -1,0 +1,1 @@
+export default function Hero() { return <section className="mx-auto max-w-6xl px-6 py-16"><h1 className="text-4xl font-extrabold">Enemmän liidejä, vähemmän säätöä.</h1><p className="mt-4 max-w-3xl text-lg text-slate-700">Rakennamme B2B-yrityksille konvertoivan tarjousputken, joka kerää liidit, pisteyttää ne ja ohjaa myynnille oikeaan aikaan.</p></section>; }

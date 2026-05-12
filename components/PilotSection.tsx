@@ -1,0 +1,1 @@
+export default function PilotSection() { return <section className="mx-auto max-w-6xl px-6 py-8"><h2 className="text-2xl font-bold">Pilotti</h2><p className="mt-3 text-slate-700">Käynnistetään 30 päivän pilotti, jossa mitataan konversio, vasteaika ja myynnin ajansäästö.</p></section>; }
