@@ -2,11 +2,64 @@
 
 :root {
   --background: #020617;
-  --foreground: #e2e8f0;
+  --foreground: #e5edf7;
+  --green: #3cff9e;
 }
 
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
-  background: radial-gradient(circle at top, #0f172a 0%, #020617 55%);
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(34, 197, 94, 0.18), transparent 30%),
+    radial-gradient(circle at 88% 12%, rgba(56, 189, 248, 0.12), transparent 32%),
+    linear-gradient(180deg, #020617 0%, #07111f 42%, #f8fafc 42%, #f8fafc 100%);
   color: var(--foreground);
-  font-family: Inter, Arial, sans-serif;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-rendering: optimizeLegibility;
 }
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--green); color: #020617; }
+.shell { width: min(1120px, calc(100% - 32px)); margin-inline: auto; }
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.surface-card {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(18px);
+}
+.dark-card {
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.86), rgba(2, 6, 23, 0.94));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.26);
+}
+.eyebrow {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(60, 255, 158, 0.26);
+  background: rgba(60, 255, 158, 0.08);
+  color: #86efac;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.section-eyebrow {
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.mobile-cta-safe { padding-bottom: 92px; }
+@media (min-width: 1024px) { .mobile-cta-safe { padding-bottom: 0; } }
